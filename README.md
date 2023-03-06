@@ -45,8 +45,10 @@ export async function *emiterator(
 ): AsyncGenerator<{event: string, args: any[]}, void, undefined> {...}
 ```
 
-If `emitter` implements one of the types from [tiny-typed-emitter]() or [typed-emitter](), then elements that are
-yielded each iteration will be typed accordingly:
+If `emitter` implements one of the types from 
+[tiny-typed-emitter](https://www.npmjs.com/package/tiny-typed-emitter) or 
+[typed-emitter](https://www.npmjs.com/package/typed-emitter), 
+then elements that are yielded each iteration will be typed accordingly:
 
 ```typescript
 interface ItemCounterEventListeners {
