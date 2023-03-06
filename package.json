@@ -1,0 +1,103 @@
+{
+    "name": "emiterator",
+    "version": "1.0.beta.1",
+    "description": "Adapter that turns EventEmitters into AsyncGenerators",
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/trevor-leach/emiterator.git"
+	},
+	"keywords": ["typescript", "EventEmitter", "AsyncGenerator", "AsyncIterator", "iterator"],
+	"author": {
+		"name": "Trevor Leach",
+		"email": "r33fshark-github@yahoo.com",
+		"url": "https://github.com/trevor-leach"
+	},
+    "license": "ISC",
+    "main":   "dist/cjs/index.js",
+    "module": "dist/mjs/index.js",
+    "types":  "dist/types/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/mjs/index.js",
+            "require": "./dist/cjs/index.js"
+        }
+    },
+    "files": [
+        "dist/**/*"
+    ],
+    "scripts": {
+        "clean": "rm -rf dist reports *.tgz",
+        "build": "tsc --project tsconfig.mjs.json && echo '{\"type\": \"module\"}' > dist/mjs/package.json && tsc --project tsconfig.cjs.json && echo '{\"type\": \"commonjs\"}' > dist/cjs/package.json",
+        "test":  "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+        "report": "typedoc --entryPointStrategy expand --out reports/docs src/ts"
+    },
+    "jest": {
+        "verbose": true,
+        "roots": [
+            "<rootDir>/src/ts",
+            "<rootDir>/test/ts"
+        ],
+        "testMatch": [
+            "**/test/**/*.+(ts|tsx|js|jsx)",
+            "**/?(*.)+(spec|test).+(ts|tsx|js|jsx)"
+        ],
+        "coverageDirectory": "reports/coverage",
+        "collectCoverage": true,
+        "collectCoverageFrom": [
+            "src/ts/**/*.ts",
+            "!src/ts/**/*.d.ts"
+        ],
+        "moduleNameMapper": {
+            "^(\\.{1,2}/.*)\\.js$": "$1",
+            "^@src/(.*)\\.js$": "<rootDir>/src/ts/$1"
+        },
+        "extensionsToTreatAsEsm": [
+            ".ts"
+        ],
+        "transform": {
+            "^.+\\.(ts|tsx)$": [
+                "ts-jest",
+                {
+                    "useESM": true
+                }
+            ]
+        },
+        "reporters": [
+            "default",
+            [
+                "jest-junit",
+                {
+                    "outputDirectory": "reports/tests/",
+                    "outputName": "junit.xml"
+                }
+            ],
+            [
+                "jest-html-reporter",
+                {
+                    "pageTitle": "Test Report",
+                    "outputPath": "reports/tests/index.html"
+                }
+            ]
+        ]
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "@tsconfig/node18": "^1.0.1",
+        "@types/jest": "^29",
+        "@types/node": "^18",
+        "jest": "^29",
+        "jest-html-reporter": "^3.7.0",
+        "jest-junit": "^15",
+        "ts-jest": "^29",
+        "ts-node": "^10.9.1",
+        "typedoc": "^0.23.24",
+        "typescript": "^4.9.5"
+    },
+    "optionalDependencies": {
+        "tiny-typed-emitter": "2.1.0",
+        "typed-emitter": "2.1.0"
+    }
+}
