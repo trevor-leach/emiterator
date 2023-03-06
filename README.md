@@ -20,11 +20,17 @@ for await (let chunk of iterator) {
      console.log(`Received ${chunk.args[0].length} bytes of data.`);
 }
 ```
-###### _this example is unnecessary in practice; Since node 10 Readable can be iterated directly_
+###### _Note: this example is unnecessary in practice; Since node 10 Readable can be iterated directly._
 <br/>
 
-The module exports a single [async generator function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function*) named 'emiterator'.
+The module exports a single [async generator function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function*) named 'emiterator'.  
+Both ESM and commonJs modules are included, so either `require` or `import` should work:
+```javascript
+import { emiterator } from 'emiterator'; // ESM
+const  { emiterator } = require('emiterator'); // commonJs
+```
 
+## Strong TypeScript Support
 ```typescript
 /**
  * @param emitter The EventEmitter.  If emitter is a TypedEmitter, then the
@@ -44,6 +50,8 @@ export async function *emiterator(
     throwEvents: string[] = []
 ): AsyncGenerator<{event: string, args: any[]}, void, undefined> {...}
 ```
+###### _Note: Simplified typing shown. The typing is much more useful when using a typed emitter interface.  See below._
+<br/>
 
 If `emitter` implements one of the types from 
 [tiny-typed-emitter](https://www.npmjs.com/package/tiny-typed-emitter) or 

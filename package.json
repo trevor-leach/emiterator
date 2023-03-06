@@ -1,6 +1,6 @@
 {
     "name": "emiterator",
-    "version": "1.0.0-beta+1",
+    "version": "1.0.0-beta2",
     "description": "Adapter that turns EventEmitters into AsyncGenerators",
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"
@@ -18,11 +18,10 @@
     "license": "ISC",
     "main":   "dist/cjs/index.js",
     "module": "dist/mjs/index.js",
-    "types":  "dist/types/index.d.ts",
     "exports": {
         ".": {
-            "import": "./dist/mjs/index.js",
-            "require": "./dist/cjs/index.js"
+            "require": "./dist/cjs/index.js",
+            "default": "./dist/mjs/index.js"
         }
     },
     "files": [

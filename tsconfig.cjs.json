@@ -4,7 +4,8 @@
         "lib": ["es2022"],
         "module": "CommonJS",
         "target": "es2022",
-        "outDir": "dist/cjs"
+        "outDir": "dist/cjs",
+        "declarationDir": "dist/cjs"
     },
     "exclude": [
       "test/**/*"
