@@ -1,6 +1,6 @@
 {
     "name": "emiterator",
-    "version": "1.0.beta.1",
+    "version": "1.0.0-beta+1",
     "description": "Adapter that turns EventEmitters into AsyncGenerators",
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"
