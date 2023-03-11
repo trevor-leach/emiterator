@@ -1,5 +1,6 @@
 import { emiterator } from '@src/index.js';
 import { EventEmitter } from 'node:events';
+import { nextTick } from 'node:process';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { type EventMap } from "typed-emitter";
 type TypedEventEmitter<Events extends EventMap> = import("typed-emitter").default<Events>;
@@ -20,7 +21,7 @@ describe('emiterator', () => {
             const emitter = new TypedEmitter<MyEventSigs>();
             const error = new Error('test error. please ignore.');
             const actual: any[][] = [];
-            setImmediate(()=> {
+            nextTick(()=> {
                 emitter.emit('string', 'foo');
                 emitter.emit('number', 1337);
                 emitter.emit('error', error);
@@ -28,23 +29,26 @@ describe('emiterator', () => {
             });
 
             const iterator = emiterator(
-                emitter, 
+                emitter,
                 ['string', 'error'],
                 ['done']
             );
-    
+
             for await (let e of iterator) {
                 actual.push(e.args);
             }
-    
+
             expect(actual).toEqual([['foo'], [error]]);
+            expect(emitter.listenerCount('string')).toBe(0);
+            expect(emitter.listenerCount('error')).toBe(0);
+            expect(emitter.listenerCount('done')).toBe(0);
         });
 
         test('throws', async () => {
             const emitter = new TypedEmitter<MyEventSigs>();
             const error = new Error('test error. please ignore.');
             const actual: any[][] = [];
-            setImmediate(()=> {
+            nextTick(()=> {
                 emitter.emit('number', 1337);
                 emitter.emit('string', 'foo');
                 emitter.emit('error', error);
@@ -52,25 +56,28 @@ describe('emiterator', () => {
             });
 
             const iterator = emiterator(
-                emitter, 
+                emitter,
                 ['number'],
                 ['done'],
                 ['error']
             );
-    
+
             await expect(async () => {
                 for await (let e of iterator) {
                     actual.push(e.args);
                 }
             }).rejects.toThrow(error)
-    
+
             expect(actual).toEqual([[1337]]);
+            expect(emitter.listenerCount('number')).toBe(0);
+            expect(emitter.listenerCount('error')).toBe(0);
+            expect(emitter.listenerCount('done')).toBe(0);
         });
 
         test('throws_nothing', async () => {
             const emitter = new TypedEmitter<MyEventSigs>();
             const actual: any[][] = [];
-            setImmediate(()=> {
+            nextTick(()=> {
                 emitter.emit('number', 1337);
                 emitter.emit('string', 'foo');
                 emitter.emit('error');
@@ -78,25 +85,28 @@ describe('emiterator', () => {
             });
 
             const iterator = emiterator(
-                emitter, 
+                emitter,
                 ['number'],
                 ['done'],
                 ['error']
             );
-    
+
             await expect(async () => {
                 for await (let e of iterator) {
                     actual.push(e.args);
                 }
             }).rejects.toThrow('error')
-    
+
             expect(actual).toEqual([[1337]]);
+            expect(emitter.listenerCount('number')).toBe(0);
+            expect(emitter.listenerCount('error')).toBe(0);
+            expect(emitter.listenerCount('done')).toBe(0);
         });
     });
 
     test('EventEmitter', async () => {
         const emitter = new EventEmitter();
-        setImmediate(()=> {
+        nextTick(()=> {
             emitter.emit('string', 'foo');
             emitter.emit('number', 1337);
             emitter.emit('done');
@@ -105,7 +115,7 @@ describe('emiterator', () => {
         const actual: any[][] = [];
 
         const iterator = emiterator(
-            emitter, 
+            emitter,
             ['string', 'number'],
             ['done']
         );
@@ -119,12 +129,15 @@ describe('emiterator', () => {
         }
 
         expect(actual).toEqual([['foo'], [1337]]);
+        expect(emitter.listenerCount('number')).toBe(0);
+        expect(emitter.listenerCount('string')).toBe(0);
+        expect(emitter.listenerCount('done')).toBe(0);
     });
 
     test('TypedEmitter', async () => {
         const emitter = new TypedEmitter<MyEventSigs>();
-        
-        setImmediate(()=> {
+
+        nextTick(()=> {
             emitter.emit('string', 'foo');
             emitter.emit('number', 1337);
             emitter.emit('strnum', 'bar', 42);
@@ -132,9 +145,11 @@ describe('emiterator', () => {
         });
 
         const actual: any[][] = [];
+        let actualNum = NaN;
+        emitter.on('number', n => actualNum = n);
 
         const iterator = emiterator(
-            emitter, 
+            emitter,
             ['string', 'strnum'],
             ['done']
         );
@@ -143,17 +158,22 @@ describe('emiterator', () => {
             actual.push(e.args);
 
             if (e.event == 'string') {
-                let a = e.args;
+                let a = e.args[0];
             }
         }
 
+        expect(actualNum).toBe(1337);
         expect(actual).toEqual([['foo'],['bar', 42]]);
+        expect(emitter.listenerCount('number')).toBe(1);
+        expect(emitter.listenerCount('string')).toBe(0);
+        expect(emitter.listenerCount('strnum')).toBe(0);
+        expect(emitter.listenerCount('done')).toBe(0);
     });
 
     test('TypedEventEmitter', async () => {
         const emitter = new EventEmitter() as TypedEventEmitter<MyEventSigs>;
-        
-        setImmediate(()=> {
+
+        nextTick(()=> {
             emitter.emit('string', 'foo');
             emitter.emit('number', 1337);
             emitter.emit('strnum', 'bar', 42);
@@ -163,7 +183,7 @@ describe('emiterator', () => {
         const actual: any[][] = [];
 
         const iterator = emiterator(
-            emitter, 
+            emitter,
             ['string', 'strnum'],
             ['done']
         );
@@ -177,5 +197,8 @@ describe('emiterator', () => {
         }
 
         expect(actual).toEqual([['foo'],['bar', 42]]);
+        expect(emitter.listenerCount('string')).toBe(0);
+        expect(emitter.listenerCount('strnum')).toBe(0);
+        expect(emitter.listenerCount('done')).toBe(0);
     });
 });

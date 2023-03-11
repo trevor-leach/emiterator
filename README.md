@@ -20,10 +20,10 @@ for await (let chunk of iterator) {
      console.log(`Received ${chunk.args[0].length} bytes of data.`);
 }
 ```
-###### _Note: this example is unnecessary in practice; Since node 10 Readable can be iterated directly._
+###### _Note: this example is unnecessary in practice; Since node 10 a Readable can be iterated directly._
 <br/>
 
-The module exports a single [async generator function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function*) named 'emiterator'.  
+The module exports a single [async generator function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function*) named 'emiterator'.
 Both ESM and commonJs modules are included, so either `require` or `import` should work:
 ```javascript
 import { emiterator } from 'emiterator'; // ESM
@@ -33,6 +33,10 @@ const  { emiterator } = require('emiterator'); // commonJs
 ## Strong TypeScript Support
 ```typescript
 /**
+ * Makes an AsyncGenerator from an EventEmitter.
+ * Behind the scenes, listeners are registered for each event specified.
+ * They are removed when any of the `doneEvents` or `throwEvents` are emitted.
+ *
  * @param emitter The EventEmitter.  If emitter is a TypedEmitter, then the
  *        elements yielded by the AsyncGenerator will typed accordingly.
  * @param dataEvents Events that will be yielded by the AsyncGenerator.
@@ -53,9 +57,9 @@ export async function *emiterator(
 ###### _Note: Simplified typing shown. The typing is much more useful when using a typed emitter interface.  See below._
 <br/>
 
-If `emitter` implements one of the types from 
-[tiny-typed-emitter](https://www.npmjs.com/package/tiny-typed-emitter) or 
-[typed-emitter](https://www.npmjs.com/package/typed-emitter), 
+If `emitter` implements one of the types from
+[tiny-typed-emitter](https://www.npmjs.com/package/tiny-typed-emitter) or
+[typed-emitter](https://www.npmjs.com/package/typed-emitter),
 then elements that are yielded each iteration will be typed accordingly:
 
 ```typescript
@@ -64,10 +68,10 @@ interface ItemCounterEventListeners {
     count: (n:number) => any
     done:  () => any
 }
-const emitter: TypedEmitter<MyEventSigs> = getCounter();
+const emitter: TypedEmitter<ItemCounterEventListeners> = getCounter();
 
 const iterator = emiterator(
-    emitter, 
+    emitter,
     ['item', 'count'],
     ['done']
 );
